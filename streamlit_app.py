@@ -244,7 +244,7 @@ def get_team_stats(team_id, tournament_id, season_id, api_key="5289910ea5msh3188
 
     return stats_data
 
-    
+
 st.write(get_team_stats(team1_id, tournament_id1, season_id1))
 team1_stats = get_team_stats(team1_id, tournament_id1, season_id1)
 
