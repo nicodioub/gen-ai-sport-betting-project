@@ -3,6 +3,8 @@ import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+#mettre le cache 
+
 os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 
 st.title("⚽ GenAI Predictions ")
@@ -23,7 +25,7 @@ prompt_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-user_input = st.text_input("What do you want me to predict ? ")
+user_input = st.text_input("What do you want me to predict ? 0_0 ")
 
 # @st.cache_data
 # def generate_response(user_input):
@@ -42,7 +44,7 @@ user_input = st.text_input("What do you want me to predict ? ")
 
 
 
-def extraire_equipes(user_input, model):
+def extraire_equipes(user_input):
   """
   Extrait les noms de deux équipes à partir de la requête d'un utilisateur
   en utilisant un modèle de langage.
@@ -61,7 +63,6 @@ def extraire_equipes(user_input, model):
           ("user", "{input}") # La requête de l'utilisateur sera insérée ici.
       ]
   )
-  user_input = 'What is the result between barcelona  and real madrid  '  # @param {type: "string"}
 
   # Appel du modèle de langage avec le prompt et la requête de l'utilisateur.
   response = model.invoke(prompt_template.invoke({"input": user_input}))
@@ -76,6 +77,9 @@ def extraire_equipes(user_input, model):
   query_result2 = teams[1].strip() if len(teams) > 1 else None  # Suppression des espaces inutiles.
 
   return query_result1, query_result2 # Retourne les noms des équipes.
+
+st.write(extraire_equipes(user_input))
+
 
 
 
