@@ -18,14 +18,9 @@ def get_model():
 
 model = get_model()
 
-prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("system", "do not answer the query but output the  teams from the query like 'Barcelona, Real Madrid' "),
-        ("user", "{input}")
-    ]
-)
 
-user_input = st.text_input("What do you want me to predict ? 0_0 ")
+
+user_input = st.text_input("What do you want me to predict ? 0_O ")
 
 # @st.cache_data
 # def generate_response(user_input):
@@ -58,11 +53,11 @@ def extraire_equipes(user_input):
   """
   # Création du template de prompt pour le modèle de langage.
   prompt_template = ChatPromptTemplate.from_messages(
-      [
-          ("system", "Ne réponds pas à la question, mais extrais les équipes de la requête comme 'Barcelona, Real Madrid' "),
-          ("user", "{input}") # La requête de l'utilisateur sera insérée ici.
-      ]
-  )
+    [
+        ("system", "do not answer the query but output the  teams from the query like 'Barcelona, Real Madrid' "),
+        ("user", "{input}")
+    ]
+)
 
   # Appel du modèle de langage avec le prompt et la requête de l'utilisateur.
   response = model.invoke(prompt_template.invoke({"input": user_input}))
