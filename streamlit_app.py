@@ -79,8 +79,8 @@ st.write(extraire_equipes(user_input))
 team_name1 = extraire_equipes(user_input)[0] # Récupération du nom de la première équipe.
 team_name2 = extraire_equipes(user_input)[1] # Récupération du nom de la première équipe.
 
-st.write(team_name1)
-st.write(team_name2)
+# st.write(team_name1)
+# st.write(team_name2)
 
 @st.cache_data
 def get_team_data(team_name, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e70382bf5"):
@@ -112,7 +112,47 @@ def get_team_data(team_name, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e
 
     return team_data
 
-st.write(get_team_data(team_name1))
-st.write(get_team_data(team_name2))
+# st.write(get_team_data(team_name1))
+# st.write(get_team_data(team_name2))
 
+team_id = 2829
+
+tournament_id = 8
+
+season_id = 61643
+
+# Récupération des données de l'équipe 1
+
+def get_team_stats(team_id, tournament_id, season_id, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e70382bf5"):
+    """
+    Récupère les statistiques d'une équipe pour un tournoi et une saison donnés via SportAPI7.
+
+    Args:
+        team_id (int): ID de l'équipe.
+        tournament_id (int): ID du tournoi.
+        season_id (int): ID de la saison.
+        api_key (str, optional): Votre clé API SportAPI7.
+                                  Par défaut : api_key.
+
+    Returns:
+        dict: Dictionnaire contenant les statistiques de l'équipe.
+    """
+    url = f"https://sportapi7.p.rapidapi.com/api/v1/team/{team_id}/unique-tournament/{tournament_id}/season/{season_id}/statistics/overall"
+
+    headers = {
+        "x-rapidapi-key": api_key,
+        "x-rapidapi-host": "sportapi7.p.rapidapi.com"}
+
+    response = requests.get(url, headers=headers)
+
+    stats = {}
+
+    for key, value in response.json()['statistics'].items():
+        stats[key] = value
+
+    stats_data = response.json()
+
+    return stats_data
+
+st.write(get_team_stats(team_id, tournament_id, season_id))
 
