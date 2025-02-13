@@ -25,20 +25,88 @@ prompt_template = ChatPromptTemplate.from_messages(
 
 user_input = st.text_input("What do you want me to predict ? ")
 
-@st.cache_data
-def generate_response(user_input):
-    #st.session_state['count'] += 1
-    prompt = prompt_template.invoke({"input": user_input})
-    response = model.invoke(prompt)
-    query_result = response.content
-    teams = query_result.split(",") if "," in query_result else [query_result]
-    query_result1, query_result2 = teams[0], teams[1]
+# @st.cache_data
+# def generate_response(user_input):
+#     #st.session_state['count'] += 1
+#     prompt = prompt_template.invoke({"input": user_input})
+#     response = model.invoke(prompt)
+#     query_result = response.content
+#     teams = query_result.split(",") if "," in query_result else [query_result]
+#     query_result1, query_result2 = teams[0], teams[1]
 
 
-    return response.content, query_result1, query_result2
+#     return response.content, query_result1, query_result2
 
-if user_input:
-    st.write(generate_response(user_input))
+# if user_input:
+#     st.write(generate_response(user_input))
+
+
+
+def extraire_equipes(user_input, model):
+  """
+  Extrait les noms de deux équipes à partir de la requête d'un utilisateur
+  en utilisant un modèle de langage.
+  Args:
+      user_input (str): La requête de l'utilisateur concernant le résultat d'un match.
+      model: L'objet du modèle de langage à utiliser pour l'inférence.
+  Returns:
+      tuple: Un tuple contenant les noms des deux équipes
+             (query_result1, query_result2).
+             Si une seule équipe est trouvée, le deuxième élément sera None.
+  """
+  # Création du template de prompt pour le modèle de langage.
+  prompt_template = ChatPromptTemplate.from_messages(
+      [
+          ("system", "Ne réponds pas à la question, mais extrais les équipes de la requête comme 'Barcelona, Real Madrid' "),
+          ("user", "{input}") # La requête de l'utilisateur sera insérée ici.
+      ]
+  )
+  user_input = 'What is the result between barcelona  and real madrid  '  # @param {type: "string"}
+
+  # Appel du modèle de langage avec le prompt et la requête de l'utilisateur.
+  response = model.invoke(prompt_template.invoke({"input": user_input}))
+  query_result = response.content # Extraction du contenu de la réponse.
+
+  # Séparation des noms d'équipes en utilisant la virgule comme délimiteur.
+  teams = query_result.split(",") if "," in query_result else [query_result]
+
+  # Attribution des noms d'équipes aux variables query_result1 et query_result2.
+  # Si une seule équipe est trouvée, query_result2 sera None.
+  query_result1 = teams[0].strip() if teams else None  # Suppression des espaces inutiles.
+  query_result2 = teams[1].strip() if len(teams) > 1 else None  # Suppression des espaces inutiles.
+
+  return query_result1, query_result2 # Retourne les noms des équipes.
+
+
+
+def get_team_data(team_name, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e70382bf5"):
+    """
+    Récupère les informations détaillées d'une équipe sportive via SportAPI7.
+
+    Args:
+        team_name (str): Nom de l'équipe.
+        api_key (str, optional): Votre clé API SportAPI7.
+                                  Par défaut : "a77e4d69aemshd774591d8fbc877p15616cjsn65f81709282b".
+
+    Returns:
+        dict: Dictionnaire contenant les données de l'équipe si trouvée,
+              sinon un dictionnaire vide.
+    """
+    url = f"https://sportapi7.p.rapidapi.com/api/v1/search/teams/{team_name}/more"
+
+    headers = {
+        "x-rapidapi-key": api_key,
+        "x-rapidapi-host": "sportapi7.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    team_data = {}
+    if "teams" in data and isinstance(data["teams"], list) and len(data["teams"]) > 0:
+        team_data = data["teams"][0]
+
+    return team_data
 
 
 # query_result = response.content
