@@ -5,14 +5,19 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import requests
 #from IPython.display import Markdown, display
 
+
+#ajouts images et liens" 
+
 #mettre le cache 
 
 os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 os.environ["SPORT_API"] = st.secrets["SPORT_API"]
 
-st.title("⚽ GenAI Predictions ")
+st.title("⚽ GenAI Football Match")
 st.write(
     " **Welcome in your match predictions app !**"
+    " **This app is powered by Google Gemini and SportAPI7.**"
+    
 )
 
 @st.cache_resource
@@ -22,23 +27,12 @@ def get_model():
 model = get_model()
 
 
-
-user_input = st.text_input("What do you want me to predict ? 0_O ")
-
-# @st.cache_data
-# def generate_response(user_input):
-#     #st.session_state['count'] += 1
-#     prompt = prompt_template.invoke({"input": user_input})
-#     response = model.invoke(prompt)
-#     query_result = response.content
-#     teams = query_result.split(",") if "," in query_result else [query_result]
-#     query_result1, query_result2 = teams[0], teams[1]
-
-
-#     return response.content, query_result1, query_result2
-
-# if user_input:
-#     st.write(generate_response(user_input))
+user_input = st.text_input("""Que voulez-vous que je prédise ? 💎                     
+                           Veuillez entrer le nom complet des équipes comme 'Real Madrid vs Barcelona'.
+                           """)
+                           
+if not user_input:
+    st.warning("Veuillez entrer les noms de deux équipes.")
 
 
 @st.cache_data
@@ -81,11 +75,10 @@ def extraire_equipes(user_input):
 team_name1 = extraire_equipes(user_input)[0] # Récupération du nom de la première équipe.
 team_name2 = extraire_equipes(user_input)[1] # Récupération du nom de la première équipe.
 
-os.environ["SPORT_API"] = st.secrets["SPORT_API"]
 
 
 @st.cache_data
-def get_team_data(team_name, api_key="5289910ea5msh3188c60f48f72eep180fc8jsnd0f153012199"):
+def get_team_data(team_name, api_key="15ebf9b943msh4e1e46c41017829p1f5a37jsnc143a8f04a24"):
     """
     Récupère les informations détaillées d'une équipe sportive via SportAPI7.
 
@@ -118,9 +111,6 @@ def get_team_data(team_name, api_key="5289910ea5msh3188c60f48f72eep180fc8jsnd0f1
 team1_data = get_team_data(team_name1)
 team2_data = get_team_data(team_name2)
 
-#st.write(team1_data)
-# id de l'équipe 1 et de l'équipe 2
-
 @st.cache_data
 def get_id_team(team_data):
     """
@@ -141,6 +131,7 @@ def get_id_team(team_data):
 team1_id = get_id_team(team1_data)
 #st.write(" team_id :" ,team1_id)
 team2_id = get_id_team(team2_data)
+
 
 # st.write(get_id_team(team1_data))
 # st.write(get_id_team(team2_data))
@@ -170,7 +161,6 @@ tournament_id1 = get_tournament_id(team1_data)
 tournament_id2 = get_tournament_id(team2_data)
 
 
-
 @st.cache_data
 def get_season_id(team_data):
     """
@@ -189,6 +179,9 @@ def get_season_id(team_data):
     ligue_1_season_id = 61736
     ligue_portugal_season_id = 63670
     bundesliga_season_id = 63516
+    CAN_season_id = 71636
+
+
 
     if team_data["primaryUniqueTournament"]['slug'] == "laliga":
         season_id = laliga_season_id
@@ -200,6 +193,8 @@ def get_season_id(team_data):
         season_id = bundesliga_season_id
     elif team_data["primaryUniqueTournament"]['slug'] == "ligue-portugal":
         season_id = ligue_portugal_season_id
+    elif team_data["primaryUniqueTournament"]['slug'] == "africa-cup-of-nations":
+        season_id = CAN_season_id
 
     return season_id
 
@@ -207,7 +202,7 @@ def get_season_id(team_data):
 season_id1 = get_season_id(team1_data)
 #st.write("season_id", season_id1)
 season_id2 = get_season_id(team2_data)
-#st.write(season_id2)
+
 
 # Récupération des données de l'équipe 1
 
