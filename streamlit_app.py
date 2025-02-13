@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
+import requests
 
 #mettre le cache 
 
@@ -38,7 +39,7 @@ user_input = st.text_input("What do you want me to predict ? 0_O ")
 #     st.write(generate_response(user_input))
 
 
-
+@st.cache_data
 def extraire_equipes(user_input):
   """
   Extrait les noms de deux équipes à partir de la requête d'un utilisateur
@@ -75,9 +76,13 @@ def extraire_equipes(user_input):
 
 st.write(extraire_equipes(user_input))
 
+team_name1 = extraire_equipes(user_input)[0] # Récupération du nom de la première équipe.
+team_name2 = extraire_equipes(user_input)[1] # Récupération du nom de la première équipe.
 
+st.write(team_name1)
+st.write(team_name2)
 
-
+@st.cache_data
 def get_team_data(team_name, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e70382bf5"):
     """
     Récupère les informations détaillées d'une équipe sportive via SportAPI7.
@@ -85,7 +90,7 @@ def get_team_data(team_name, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e
     Args:
         team_name (str): Nom de l'équipe.
         api_key (str, optional): Votre clé API SportAPI7.
-                                  Par défaut : "a77e4d69aemshd774591d8fbc877p15616cjsn65f81709282b".
+                                  Par défaut : api_key.
 
     Returns:
         dict: Dictionnaire contenant les données de l'équipe si trouvée,
@@ -107,122 +112,7 @@ def get_team_data(team_name, api_key="081a622178msh47c970908ee3fe1p175ee7jsndc3e
 
     return team_data
 
-
-# query_result = response.content
-
-# # Je stocke les valeurs des deux équipes pour une utilisation future
-
-# teams = query_result.split(",") if "," in query_result else [query_result]
-
-# # Stocker dans des variables distinctes
-# query_result1, query_result2 = teams[0], teams[1]
+st.write(get_team_data(team_name1))
+st.write(get_team_data(team_name2))
 
 
-
-#####
-
-# prompt = st.text_input("Enter your prompt:")
-
-# @st.cache_data
-# def generate_response(prompt):
-#     return "Hello, " + prompt
-
-# if prompt:
-#     st.write(generate_response(prompt))
-
-
-# prompt = st.chat_input("Say something")
-# if prompt : 
-#     st.write(f"User has sent the following prompt: {prompt}")
-
-
-# #st.chat_message
-
-
-# import numpy as np
-# message = st.chat_message("assistant")
-# message.write("Hello human")
-# message.bar_chart(np.random.randn(30, 3))
-
-
-
-# import streamlit as st
-# import os 
-
-# os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
-
-# from langchain_google_genai import ChatGoogleGenerativeAI
-
-# model = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-
-
-# from langchain_core.prompts import ChatPromptTemplate
-
-# prompt = st.text_input("What match do you want our AI to predict ex : 'manchester city vs real madrid '", key="match")
-
-
-# prompt_template = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", "do not answer the query but output the  teams from the query like 'Barcelona, Real Madrid' "),
-#         ("user", "{prompt}")
-#     ]
-# )
-
-# # user_input = 'What is the result between liverpool  and barcelona  '  # @param {type: "string"}
-
-
-
-# response = model.invoke(prompt_template.invoke({"input": prompt}))
-
-# query_result = response.content
-
-# st.session_state.match
-
-# # # Je stocke les valeurs des deux équipes pour une utilisation future
-
-# # teams = query_result.split(",") if "," in query_result else [query_result]
-
-# # # Stocker dans des variables distinctes
-# # query_result1, query_result2 = teams[0], teams[1]
-
-# # print(query_result1)
-# # print(query_result2)
-
-
-
-
-# # import streamlit as st
-# # import pandas as pd
-
-# # st.write("Hello, what would you like our AI to predict ? ")
-
-# # df = pd.DataFrame({
-# #     'first column': [1, 2, 3, 4],
-# #     'second column': [10, 20, 30, 40]
-# # })
-
-# # option = st.selectbox(
-# #     "Which number do you like best?",
-# #     df['first column']
-# # )
-
-# # if option > 2:
-# #     st.write("The option selected is above 2")
-
-# # else :
-# #     st.write("The option selected is below or equal to 2")
-
-
-
-# # x = st.slider('x')  # 👈 this is a widget
-# # st.write(x, 'squared is', x * x)
-
-
-# # prompt = st.text_input("What match do you want our AI to predict ex : 'manchester city vs real madrid '", key="match")
-
-# # # You can access the value at any point with:
-# # st.session_state.match
-
-# # @st.cache_data
-# # def generate_response(prompt):
-# #     return "This is a response to your prompt: " + prompt
