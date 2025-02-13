@@ -3,6 +3,7 @@ import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import requests
+#from IPython.display import Markdown, display
 
 #mettre le cache 
 
@@ -138,6 +139,7 @@ def get_id_team(team_data):
 
 
 team1_id = get_id_team(team1_data)
+#st.write(" team_id :" ,team1_id)
 team2_id = get_id_team(team2_data)
 
 # st.write(get_id_team(team1_data))
@@ -155,14 +157,19 @@ def get_tournament_id(team_data):
     Returns:
         int: ID du tournoi.
     """
-    if team_data and "tournament" in team_data and "id" in team_data["tournament"]:
-        return team_data["tournament"]["id"]
+
+
+    if team_data and "primaryUniqueTournament" in team_data and "id" in team_data["primaryUniqueTournament"]:
+        return team_data["primaryUniqueTournament"]["id"]
     else:
         return None
     
 # Récupération de l'ID du tournoi
 tournament_id1 = get_tournament_id(team1_data)
+#st.write("tounrament_id : ", tournament_id1)
 tournament_id2 = get_tournament_id(team2_data)
+
+
 
 @st.cache_data
 def get_season_id(team_data):
@@ -198,22 +205,14 @@ def get_season_id(team_data):
 
 # Récupération de l'ID de la saison
 season_id1 = get_season_id(team1_data)
-st.write(season_id1)
+#st.write("season_id", season_id1)
 season_id2 = get_season_id(team2_data)
 #st.write(season_id2)
-
-
-
-# team_id = 2829
-
-# tournament_id = 8
-
-# season_id = 61643
 
 # Récupération des données de l'équipe 1
 
 @st.cache_data
-def get_team_stats(team_id, tournament_id, season_id, api_key="5289910ea5msh3188c60f48f72eep180fc8jsnd0f153012199"):
+def get_team_stats(team_id, tournament_id, season_id, api_key="15ebf9b943msh4e1e46c41017829p1f5a37jsnc143a8f04a24"):
     """
     Récupère les statistiques d'une équipe pour un tournoi et une saison donnés via SportAPI7.
 
@@ -236,25 +235,34 @@ def get_team_stats(team_id, tournament_id, season_id, api_key="5289910ea5msh3188
     response = requests.get(url, headers=headers)
 
     stats = {}
-
+       
     for key, value in response.json()['statistics'].items():
         stats[key] = value
 
     stats_data = response.json()
 
-    return stats_data
+    return stats
+
+# Récupération des statistiques de l'équipe 1
+#st.write(get_team_stats(team1_id, tournament_id1, season_id1))
+#st.write(get_team_stats(team_id, tournament_id, season_id))
+#st.write(get_team_stats(team1_id, tournament_id1, season_id1))
 
 
-st.write(get_team_stats(team1_id, tournament_id1, season_id1))
+
+
 team1_stats = get_team_stats(team1_id, tournament_id1, season_id1)
+
 
 team2_stats = get_team_stats(team2_id, tournament_id2, season_id2)
 
+#team1_stats
 #st.write(team2_stats)
 
 
 
 
+@st.cache_data
 def calculer_statistiques_equipe(stats):
     """
     Calcule les statistiques d'une équipe de football à partir de données brutes.
@@ -315,9 +323,15 @@ def calculer_statistiques_equipe(stats):
 
     return statistiques_calculees
 
+team1_analyse = calculer_statistiques_equipe(team1_stats)
+team2_analyse = calculer_statistiques_equipe(team2_stats)
+
 # Exemple d'utilisation :
 # stats_equipe1 = calculer_statistiques_equipe(stats)
 # print(stats_equipe1)
+
+
+
 
 
 
@@ -356,3 +370,47 @@ def calculer_statistiques_equipe_individuelle(stats):
     # (Le code de calcul des statistiques reste le même que précédemment)
     # ... (Copiez le code de la fonction calculer_statistiques_equipe originale ici) ...
     return statistiques_calculees
+
+def predict_match_outcome(list_stats, list_stats2, query_result1, query_result2):
+    """
+    Predicts the outcome of a match between two teams based on their statistics.
+
+    Args:
+        list_stats (dict): Statistics for the first team.
+        list_stats2 (dict): Statistics for the second team.
+        query_result1 (str): Name of the first team.
+        query_result2 (str): Name of the second team.
+        model: The language model to use for prediction.
+
+    Returns:
+        str: The predicted outcome of the match.
+    """
+    stats1_str = "\n".join([f"{key}: {value:.2f}" for key, value in team1_analyse.items()])
+    stats2_str = "\n".join([f"{key}: {value:.2f}" for key, value in team2_analyse.items()])
+
+    formatted_input = f"""Voici les statistiques des deux équipes :
+
+    {query_result1} :
+    {stats1_str}
+
+    {query_result2} :
+    {stats2_str}
+
+    """
+
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            ("system", """Prends ces deux stats et compare les pour dire quelle équipe va gagner, ou si c'est un match nulle. Donne une affirmation du style(Real madrid va gagner)  sans aucune hésitation en citant le nom
+            de l'équipe donne aussi des explications selon les différentes stats et avec un facteur pourcentage de victoire total  """),
+            ("user", "{input}")
+        ]
+    )
+
+    response_final = model.invoke(prompt_template.invoke({"input": formatted_input}))
+    query_result = response_final.content
+    return query_result
+
+st.write(predict_match_outcome(team1_analyse, team2_analyse, team_name1, team_name2))
+
+
+
