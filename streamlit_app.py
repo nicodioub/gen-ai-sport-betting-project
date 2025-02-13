@@ -238,13 +238,6 @@ def get_team_stats(team_id, tournament_id, season_id, api_key="15ebf9b943msh4e1e
 
     return stats
 
-# Récupération des statistiques de l'équipe 1
-#st.write(get_team_stats(team1_id, tournament_id1, season_id1))
-#st.write(get_team_stats(team_id, tournament_id, season_id))
-#st.write(get_team_stats(team1_id, tournament_id1, season_id1))
-
-
-
 
 team1_stats = get_team_stats(team1_id, tournament_id1, season_id1)
 
