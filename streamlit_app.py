@@ -81,7 +81,9 @@ def extraire_equipes(user_input):
 team_name1 = extraire_equipes(user_input)[0] # Récupération du nom de la première équipe.
 team_name2 = extraire_equipes(user_input)[1] # Récupération du nom de la première équipe.
 
-
+if not team_name1 or not team_name2:
+    st.warning("Veuillez entrer une requête valide contenant deux équipes.")
+    st.stop()
 
 @st.cache_data
 def get_team_data(team_name, api_key="dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce"):
