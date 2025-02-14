@@ -13,14 +13,17 @@ import streamlit as st
 
 #mettre le cache 
 
+# Set environment variables for API keys
 os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 os.environ["SPORT_API"] = st.secrets["SPORT_API"]
 
+# Set the title of the Streamlit app
 st.title("⚽ GenAI Football Match")
+
+# Display a welcome message
 st.write(
     " **Welcome in your match predictions app !**"
     " **This app is powered by Google Gemini and SportAPI7.**"
-    
 )
 
 @st.cache_resource
@@ -29,7 +32,7 @@ def get_model():
 
 model = get_model()
 
-
+# User input for team names
 user_input = st.text_input("""Que voulez-vous que je prédise ? 💎                     
                            Veuillez entrer le nom complet des équipes comme 'Real Madrid vs Barcelona'.
                            """)
@@ -40,7 +43,7 @@ if not user_input:
 
 
 
-
+# Extraire les noms des équipes à partir de la requête de l'utilisateur
 @st.cache_data
 def extraire_equipes(user_input):
   """
@@ -86,6 +89,7 @@ if not team_name1 or not team_name2:
     st.warning("Veuillez entrer une requête valide contenant deux équipes.")
     st.stop()
 
+# effectuer une recherche API avec en paramètre le nom de l'équipe
 @st.cache_data
 def get_team_data(team_name, api_key="7625a365fbmsh76edc93ea871092p1256cfjsn03cf45f70e1f"):
     """
@@ -120,6 +124,8 @@ def get_team_data(team_name, api_key="7625a365fbmsh76edc93ea871092p1256cfjsn03cf
 team1_data = get_team_data(team_name1)
 team2_data = get_team_data(team_name2)
 
+
+# Récupérer l'id de l'équipe à partir des données de l'équipe
 @st.cache_data
 def get_id_team(team_data):
     """
@@ -146,7 +152,7 @@ team2_id = get_id_team(team2_data)
 # st.write(get_id_team(team1_data))
 # st.write(get_id_team(team2_data))
 
-
+# Récupérer l'ID du tournoi à partir des données de l'équipe
 @st.cache_data
 def get_tournament_id(team_data):
     """
@@ -170,7 +176,7 @@ tournament_id1 = get_tournament_id(team1_data)
 #st.write("tounrament_id : ", tournament_id1)
 tournament_id2 = get_tournament_id(team2_data)
 
-
+#Récupérer l'ID de la saison à partir des données de l'équipe
 @st.cache_data
 def get_season_id(team_data):
     """
@@ -217,7 +223,7 @@ if not season_id1 or not season_id2:
     st.warning("Veuillez entrer une requête valide contenant deux équipes.")
     st.stop()
 
-
+#Récupérer l'image de l'équipe à partir de l'API
 @st.cache_data
 def get_team_image(team_id):
     """
@@ -272,7 +278,7 @@ with col2:
         st.warning("⚠️ Image not available for Team 2")
 
 
-# Récupération des données de l'équipe 1
+# Récupération des stats de l'équipe 1
 
 @st.cache_data
 def get_team_stats(team_id, tournament_id, season_id, api_key="7625a365fbmsh76edc93ea871092p1256cfjsn03cf45f70e1f"):
@@ -317,7 +323,7 @@ team2_stats = get_team_stats(team2_id, tournament_id2, season_id2)
 
 
 
-
+# Utilisation des stats pour créer des indicateurs de performance
 @st.cache_data
 def calculer_statistiques_equipe(stats):
     """
@@ -389,44 +395,7 @@ team2_analyse = calculer_statistiques_equipe(team2_stats)
 
 
 
-
-
-def calculer_statistiques_equipes(stats1, stats2):
-    """
-    Calcule les statistiques de deux équipes de football à partir de données brutes.
-
-    Args:
-        stats1 (dict): Un dictionnaire contenant les statistiques brutes de l'équipe 1.
-        stats2 (dict): Un dictionnaire contenant les statistiques brutes de l'équipe 2.
-
-    Returns:
-        tuple: Un tuple contenant deux dictionnaires, un pour chaque équipe,
-               contenant les statistiques calculées.
-    """
-
-    # Calcul des statistiques pour l'équipe 1
-    statistiques_equipe1 = calculer_statistiques_equipe_individuelle(stats1)
-
-    # Calcul des statistiques pour l'équipe 2
-    statistiques_equipe2 = calculer_statistiques_equipe_individuelle(stats2)
-
-    return statistiques_equipe1, statistiques_equipe2
-
-
-def calculer_statistiques_equipe_individuelle(stats):
-    """
-    Calcule les statistiques d'une seule équipe de football à partir de données brutes.
-
-    Args:
-        stats (dict): Un dictionnaire contenant les statistiques brutes de l'équipe.
-
-    Returns:
-        dict: Un dictionnaire contenant les statistiques calculées pour l'équipe.
-    """
-    # (Le code de calcul des statistiques reste le même que précédemment)
-    # ... (Copiez le code de la fonction calculer_statistiques_equipe originale ici) ...
-    return statistiques_calculees
-
+# Fonction pour prédire le résultat du match en fonction des statistiques
 def predict_match_outcome(list_stats, list_stats2, query_result1, query_result2):
     """
     Predicts the outcome of a match between two teams based on their statistics.
