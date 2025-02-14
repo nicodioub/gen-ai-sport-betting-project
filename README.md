@@ -67,15 +67,9 @@ Conception d'une AI générative permettant de prédire les résultats de rencon
 - Fecth des données par requête API :
 
 
-  ##### Sofascore
-   https://www.sofascore.com/  --> version gratuite 1000 demandes à nous deux par mois 
+  ##### SportAPI
+https://rapidapi.com/category/Sports --> 50 requêtes par mois
 
-  ##### API-Football
-  https://www.api-football.com/
-
-
-  ##### Football-data.org
-  https://www.football-data.org/
 
 
   #### Traitement des données
