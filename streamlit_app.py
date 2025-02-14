@@ -81,12 +81,13 @@ def extraire_equipes(user_input):
 team_name1 = extraire_equipes(user_input)[0] # Récupération du nom de la première équipe.
 team_name2 = extraire_equipes(user_input)[1] # Récupération du nom de la première équipe.
 
+
 if not team_name1 or not team_name2:
     st.warning("Veuillez entrer une requête valide contenant deux équipes.")
     st.stop()
 
 @st.cache_data
-def get_team_data(team_name, api_key="dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce"):
+def get_team_data(team_name, api_key="7625a365fbmsh76edc93ea871092p1256cfjsn03cf45f70e1f"):
     """
     Récupère les informations détaillées d'une équipe sportive via SportAPI7.
 
@@ -212,6 +213,10 @@ season_id1 = get_season_id(team1_data)
 #st.write("season_id", season_id1)
 season_id2 = get_season_id(team2_data)
 
+if not season_id1 or not season_id2:
+    st.warning("Veuillez entrer une requête valide contenant deux équipes.")
+    st.stop()
+
 
 @st.cache_data
 def get_team_image(team_id):
@@ -227,7 +232,7 @@ def get_team_image(team_id):
     url = f"https://sportapi7.p.rapidapi.com/api/v1/team/{team_id}/image"
 
     headers = {
-        "x-rapidapi-key": "dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce",  # Replace with your real API key
+        "x-rapidapi-key": "7625a365fbmsh76edc93ea871092p1256cfjsn03cf45f70e1f",  # Replace with your real API key
         "x-rapidapi-host": "sportapi7.p.rapidapi.com"
     }
 
@@ -270,7 +275,7 @@ with col2:
 # Récupération des données de l'équipe 1
 
 @st.cache_data
-def get_team_stats(team_id, tournament_id, season_id, api_key="dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce"):
+def get_team_stats(team_id, tournament_id, season_id, api_key="7625a365fbmsh76edc93ea871092p1256cfjsn03cf45f70e1f"):
     """
     Récupère les statistiques d'une équipe pour un tournoi et une saison donnés via SportAPI7.
 
