@@ -3,6 +3,9 @@ import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import requests
+from PIL import Image
+from io import BytesIO
+import streamlit as st
 #from IPython.display import Markdown, display
 
 
@@ -33,6 +36,9 @@ user_input = st.text_input("""Que voulez-vous que je prédise ? 💎
                            
 if not user_input:
     st.warning("Veuillez entrer les noms de deux équipes.")
+    st.stop()  # Stop execution immediately
+
+
 
 
 @st.cache_data
@@ -78,7 +84,7 @@ team_name2 = extraire_equipes(user_input)[1] # Récupération du nom de la premi
 
 
 @st.cache_data
-def get_team_data(team_name, api_key="15ebf9b943msh4e1e46c41017829p1f5a37jsnc143a8f04a24"):
+def get_team_data(team_name, api_key="dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce"):
     """
     Récupère les informations détaillées d'une équipe sportive via SportAPI7.
 
@@ -129,6 +135,7 @@ def get_id_team(team_data):
 
 
 team1_id = get_id_team(team1_data)
+
 #st.write(" team_id :" ,team1_id)
 team2_id = get_id_team(team2_data)
 
@@ -204,10 +211,64 @@ season_id1 = get_season_id(team1_data)
 season_id2 = get_season_id(team2_data)
 
 
+@st.cache_data
+def get_team_image(team_id):
+    """
+    Fetches the image of a team using its ID.
+
+    Args:
+        team_id (int): The ID of the team.
+
+    Returns:
+        bytes: Image binary data if successful, otherwise None.
+    """
+    url = f"https://sportapi7.p.rapidapi.com/api/v1/team/{team_id}/image"
+
+    headers = {
+        "x-rapidapi-key": "dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce",  # Replace with your real API key
+        "x-rapidapi-host": "sportapi7.p.rapidapi.com"
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.content  # Returns raw binary image data (like .blob() in JS)
+        else:
+            print(f"API Error: {response.status_code} - {response.text}")
+            return None
+
+    except requests.RequestException as e:
+        print(f"Connection Error: {e}")
+        return None
+
+# Example usage:
+team1_image_data = get_team_image(team1_id)  # Replace with a real team ID
+team2_image_data = get_team_image(team2_id)  # Replace with a real team ID
+
+# Display images side by side in Streamlit
+col1, col2 = st.columns(2)
+
+with col1:
+    if team1_image_data:
+        image = Image.open(BytesIO(team1_image_data))
+        st.image(image, caption=team_name1)
+    else:
+        st.warning("⚠️ Image not available for Team 1")
+
+with col2:
+    if team2_image_data:
+        image = Image.open(BytesIO(team2_image_data))
+        st.image(image, caption=team_name2)
+    else:
+        st.warning("⚠️ Image not available for Team 2")
+
+
 # Récupération des données de l'équipe 1
 
 @st.cache_data
-def get_team_stats(team_id, tournament_id, season_id, api_key="15ebf9b943msh4e1e46c41017829p1f5a37jsnc143a8f04a24"):
+def get_team_stats(team_id, tournament_id, season_id, api_key="dc45380d2dmsh3fd40e12d2127bdp1b2b78jsnf2c997253cce"):
     """
     Récupère les statistiques d'une équipe pour un tournoi et une saison donnés via SportAPI7.
 
